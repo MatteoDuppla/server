@@ -1,6 +1,10 @@
 const express = require('express')
 const path = require('path');
+const cors = require('cors')
+const session = require("express-session");
+const cookies = require('cookie-parser');
 const serverless = require('serverless-http')
+const usersController = require('./controllers/userController');
 
 const app = express();
 const router = express.Router();
@@ -18,23 +22,16 @@ app.use(express.urlencoded({ extended: false }));
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/view');
-app.use(express.static(path.join(__dirname, '../public')));
 
-router.get('/',(req,res)=>{
-    res.json({
-        'path':'home',
-        'fistName':"Matteo",
-        'lastName':'Saha'
-    });
-});
 
-router.get('/json',(req,res)=>{
-    res.json({
-        'path':'json',
-        'autonr':"Matteo"
-    });
-});
+router.post('/register', usersController.register);
 
-app.use('/.netlify/functions/api',router);
+router.get('/update/:id', usersController.update)
+router.get('/remove/:id', usersController.borrar)
+router.get('/login', usersController.login)
+router.post('/login',usersController.loginProcess)
+
+
+app.use('/.netlify/functions/users',router);
 
 module.exports.handler = serverless(app);
